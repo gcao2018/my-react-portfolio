@@ -1,0 +1,18 @@
+.experience, .education, .certifications, .skills, .projects {
+    margin: 0rem;
+    padding: 0rem;
+    line-height: 1rem;
+}
+
+.role {
+    display: flex;
+    justify-content: space-between;
+}
+
+.responsibilities {
+    margin: 0rem;
+    padding: 0rem;
+    margin-bottom: 1rem;
+    padding-left: 1rem;
+    line-height: 1rem;
+}
