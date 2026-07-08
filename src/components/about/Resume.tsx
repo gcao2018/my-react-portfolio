@@ -1,7 +1,8 @@
+import { Paper } from '@mui/material';
 import './Resume.css'
 
 export default function Resume() {
-  return <div className='resume'>
+  return <Paper>
     <h3 className='experience'>Work Experience</h3>
     <span className='company'><b>Fidelity Investments</b>, Merrimack, NH</span>
     <div className='role'>
@@ -37,7 +38,9 @@ export default function Resume() {
       <span className='company'><b>State Street Global Advisors</b>, Boston, MA</span>
       <span className='date-range'>Jan 2017 - Jun 2017</span>
     </div>
-    <i className='job-title'>Junior Systems Analyst Co-op</i>
+    <div className='role'>
+      <i className='job-title'>Junior Systems Analyst Co-op</i>
+    </div>
     <ul className='responsibilities'>
       <li>Programmed Visual Basic macros to generate XML files and FIX protocol compliant strings from Excel data sets or user inputs.</li>
       <li>Performed data analysis and quality assurance.</li>
@@ -46,7 +49,8 @@ export default function Resume() {
       <span className='company'><b>Massachusetts Educational Financing Authority (MEFA)</b>, Boston, MA</span>
       <span className='date-range'>Jun 2014 - Aug 2014</span>
     </div>
-    <i className='job-title'>Intern</i>
+    <div className='role'>
+      <i className='job-title'>Intern</i></div>
     <ul className='responsibilities'>
       <li>Debugged promissory note and affidavit scanning system.</li>
     </ul>
@@ -59,7 +63,8 @@ export default function Resume() {
       <span className='college'>College of Computer and Information Science</span>
       <span className='gpa'>GPA: 3.3</span>
     </div>
-    <i>Bachelor of Science in Computer Science and Business Concentration in Finance</i>
+    <div className='role'>
+      <i>Bachelor of Science in Computer Science and Business Concentration in Finance</i></div>
     <ul className='responsibilities'>
       <li><b>Related Courses</b>: Software Development, Algorithms and Data Structures, Object Oriented Design, Networks and Distributed Systems, Logic and Computation, Fundamentals of Computer Science I and II, Discrete Structures, Financial Risk Management, International Finance, Microeconomics, Macroeconomics</li>
       <li><b>Honors</b>: National Merit Scholarship</li>
@@ -77,6 +82,6 @@ export default function Resume() {
       <li><b>Systems</b>: Linux, Macintosh, Windows</li>
     </ul>
     <h3 className='projects'>Other Projects</h3>
-    <span>Yahoo Finance Web Crawler (Python), Arbitrage Calculator (Python), Othello (Python), Tetris (Java), Snake (Java), Snake-Racers (Java), Dijkstra’s Shortest Path’s Algorithm (Java)</span>
-  </div>;
+    <div className='projects'>Yahoo Finance Web Crawler (Python), Arbitrage Calculator (Python), Othello (Python), Tetris (Java), Snake (Java), Snake-Racers (Java), Dijkstra’s Shortest Path’s Algorithm (Java)</div>
+  </Paper>;
 };

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router';
 export default function Navbar() {
     const navigate = useNavigate();
 
-    return <AppBar position='static' variant='outlined' sx={{ mb: 1, bgcolor: '#353935' }}>
+    return <AppBar position='static'>
         <Toolbar variant='dense' disableGutters>
             <Button color='inherit' onClick={(): void => { navigate('/'); }}>Home</Button>
             <Button color='inherit' onClick={(): void => { navigate('/resume'); }}>Resume</Button>

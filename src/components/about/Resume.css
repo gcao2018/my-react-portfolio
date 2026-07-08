@@ -1,4 +1,4 @@
-.experience, .education, .certifications, .skills, .projects {
+.experience, .education, .certifications, .skills, .projects, .role, .responsibilities {
     margin: 0rem;
     padding: 0rem;
     line-height: 1rem;
@@ -10,9 +10,6 @@
 }
 
 .responsibilities {
-    margin: 0rem;
-    padding: 0rem;
     margin-bottom: 1rem;
     padding-left: 1rem;
-    line-height: 1rem;
 }

@@ -1,8 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router';
-import './App.css'
 import Resume from './components/about/Resume';
 import Home from './components/home/Home';
-import Navbar from './components/navbar/NavBar';
+import Navbar from './components/navbar/Navbar';
 
 export default function App() {
   return <div className='my-app'>
