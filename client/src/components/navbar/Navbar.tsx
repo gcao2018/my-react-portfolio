@@ -8,7 +8,7 @@ export default function Navbar() {
         <Toolbar variant='dense' disableGutters>
             <Button color='inherit' onClick={(): void => { navigate('/'); }}>Home</Button>
             <Button color='inherit' onClick={(): void => { navigate('/resume'); }}>Resume</Button>
-            <Button color='inherit'>Login</Button>
+            <Button color='inherit' onClick={(): void => { navigate('/tradier-dashboard')}}>Login With Tradier</Button>
         </Toolbar>
     </AppBar>;
 };
