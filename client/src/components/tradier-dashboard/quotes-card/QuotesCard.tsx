@@ -2,6 +2,7 @@ import { useState, type Dispatch, type ReactNode, type SetStateAction } from 're
 import { Box, Card, CardContent, CardHeader, IconButton, Paper, TextField, Typography } from '@mui/material';
 import { Search, Visibility } from '@mui/icons-material';
 import { quoteService, type Quote } from '../../../api/quote-service';
+import { formatCurrency } from '../../../utils/currency';
 
 export default function QuotesCard(): ReactNode {
     const [search, setSearch]: [string, Dispatch<SetStateAction<string>>] = useState('');
@@ -22,13 +23,6 @@ export default function QuotesCard(): ReactNode {
             }
         }
     }
-
-    function formatCurrency (value: number, currencyCode: string): string {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: currencyCode,
-        }).format(value);
-    };
     
     return <Card className='quotes-card' variant='outlined' sx={{ m: 1, width: 320 }}>
         <CardHeader
