@@ -1,7 +1,7 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from 'react';
+import { useState, type Dispatch, type SetStateAction } from 'react';
 import axios from 'axios';
-import { Box, Card, CardContent, CardHeader, IconButton, InputAdornment, Paper, TextField, Typography } from '@mui/material';
-import { Search } from '@mui/icons-material';
+import { Box, Card, CardContent, CardHeader, IconButton, Paper, TextField, Typography } from '@mui/material';
+import { Search, Visibility } from '@mui/icons-material';
 
 interface Quotes {
     data: {
@@ -42,23 +42,26 @@ interface Quote {
 }
 
 export default function QuotesCard() {
+    const [search, setSearch]: [string, Dispatch<SetStateAction<string>>] = useState('');
     const [quote, setQuote]: [Quote | undefined, Dispatch<SetStateAction<Quote | undefined>>] = useState<Quote | undefined>(undefined);
     const [error, setError]: [string | undefined, Dispatch<SetStateAction<string | undefined>>] = useState<string | undefined>(undefined);
-    
-    useEffect(() => {
-        const fetchQuotes = async () => {
-            try {
-                const response: Quotes = await axios.get('http://localhost:3000/api/quote/GOOG');
-                const quote: Quote = response.data.quotes.quote;
-                setQuote(quote); 
-            } catch (e: unknown) {
-                if (e instanceof Error) {
-                    setError(e.message);
-                }
+
+    function handleChange(event: React.ChangeEvent<HTMLInputElement>): void {
+        setSearch(event.target.value);
+    }
+
+    async function fetchQuotes(): Promise<void> {
+        try {
+            const response: Quotes = await axios.get(`http://localhost:3000/api/quote/${search}`);
+            const quote: Quote = response.data.quotes.quote;
+            setQuote(quote); 
+        } catch (e: unknown) {
+            if (e instanceof Error) {
+                setError(e.message);
             }
         }
-        fetchQuotes();
-    });
+    }
+    
 
     function formatCurrency (value: number, currencyCode: string): string {
         return new Intl.NumberFormat('en-US', {
@@ -66,32 +69,30 @@ export default function QuotesCard() {
             currency: currencyCode,
         }).format(value);
     };
-
-    if (error) {
-        return error;
-    }
     
-    return <Card variant='outlined' sx={{ m: 1, width: 320 }}>
-        <CardHeader title={<Typography variant='h6'>Quotes</Typography>} disableTypography={true} sx={{ py: 0.5, borderBottom: 1, borderBottomColor: 'inherit' }} />
-        <CardContent sx={{ pt: 0, pb: 0, blockSize: 56, borderBottom: 1, borderBlockColor: 'inherit' }}>
-            <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
-                <TextField
-                    variant='outlined'
-                    size='small'
-                    sx={{ py: 1 }}
-                    slotProps={{
-                        input: {
-                            endAdornment: <Paper variant='outlined'>
-                                <InputAdornment position='end' sx={{ mx: 0, borderRadius: 1 }}>
-                                    <IconButton sx={{ p: 0.5 }}><Search /></IconButton>
-                                </InputAdornment>
-                            </Paper>,
-                            sx: { pl: 0, pr: 0.5, width: 288 }
-                        }
-                    }}
-                    placeholder='Enter a symbol for quote data...'
-                />
-            </Box>
+    return <Card className='quotes-card' variant='outlined' sx={{ m: 1, width: 320 }}>
+        <CardHeader className='quotes-header' title={<Typography variant='h6'>Quotes</Typography>} disableTypography={true} sx={{ py: 0.5, borderBottom: 1, borderBottomColor: 'inherit' }} />
+        <CardContent className='search-bar-content' sx={{ pt: 0, pb: 0, blockSize: 56, borderBottom: 1, borderBlockColor: 'inherit' }}>
+            <TextField
+                variant='outlined'
+                size='small'
+                type='text'
+                value={search}
+                className='search-bar-input'
+                onChange={handleChange}
+                sx={{ mt: 1 }}
+                slotProps={{
+                    input: {
+                        endAdornment: <Paper className='icon-outline' variant='outlined'>
+                            <IconButton className='search-button' sx={{ p: 0.5 }} onClick={fetchQuotes}>
+                                <Search className='search-icon' />
+                            </IconButton>
+                        </Paper>,
+                        sx: { pl: 0, pr: 0.5, width: 288 }
+                    }
+                }}
+                placeholder='Enter a symbol for quote data...'
+            />
         </CardContent>
         { quote ?
             <CardContent sx={{ pt: 0.5, pb: 0, blockSize: 289, borderBlockColor: 'inherit' }}>
@@ -136,13 +137,18 @@ export default function QuotesCard() {
                     <Typography variant='body2'>{formatCurrency(quote.open, 'USD')}</Typography>
                     <Typography variant='body2'>{formatCurrency(quote.close, 'USD')}</Typography>
                 </Box>
-                <Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                     <Box>
                         <Typography variant='body2' sx={{ pt: 1 }}>Volume</Typography>
                         <Typography variant='body2'>{quote.volume.toLocaleString('en-US')}</Typography>
                     </Box>
+                    <Paper className='icon-outline' variant='outlined' sx={{ py: 0, mt: 1.5 }}>
+                        <IconButton className='watch-button' sx={{ p: 0.5 }}>
+                            <Visibility className='watch-icon' />
+                        </IconButton>
+                    </Paper>
                 </Box>
             </CardContent>
-        : undefined }
+        : error }
     </Card>;
 }
