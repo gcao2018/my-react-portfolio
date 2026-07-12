@@ -1,7 +1,8 @@
 import { Paper } from '@mui/material';
 import './Resume.css'
+import type { ReactNode } from 'react';
 
-export default function Resume() {
+export default function Resume(): ReactNode {
   return <Paper>
     <h3 className='experience'>Work Experience</h3>
     <span className='company'><b>Fidelity Investments</b>, Merrimack, NH</span>

@@ -1,7 +1,8 @@
 import { AppBar, Button, Toolbar } from '@mui/material';
+import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router';
 
-export default function Navbar() {
+export default function Navbar(): ReactNode {
     const navigate = useNavigate();
 
     return <AppBar position='static'>
