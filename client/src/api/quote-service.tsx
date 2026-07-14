@@ -1,4 +1,4 @@
-import axios from 'axios';
+import apiClient from './api-client';
 
 interface Quotes {
     data: {
@@ -45,7 +45,7 @@ interface QuoteService {
 export const quoteService: QuoteService = {
     fetchQuote: async (quote: string): Promise<Quote> => {
         try {
-            const response: Quotes = await axios.get(`${import.meta.env.VITE_PUBLIC_SERVER}/api/quote/${quote}`);
+            const response: Quotes = await apiClient.get(`/api/quote/${quote}`);
             return response.data.quotes.quote;
         } catch (e: unknown) {
             if (e instanceof Error) {
