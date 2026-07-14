@@ -69,7 +69,7 @@ export default function QuotesCard(props: QuotesCardProperties): ReactNode {
             <CardContent sx={{ pt: 0.5, pb: 0, blockSize: 288, borderBlockColor: 'inherit' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                     <Typography variant='body2' sx={{ lineHeight: '20px' }}><b>{quote.symbol}</b></Typography>
-                    <Typography variant='body2' sx={{ lineHeight: '20px' }}><b>${quote.last}</b></Typography>
+                    <Typography variant='body2' sx={{ lineHeight: '20px' }}><b>{formatCurrency(quote.last, 'USD')}</b></Typography>
                 </Box>
                 <Typography variant='body2' sx={{ lineHeight: '20px' }}>{quote?.description}</Typography>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', pt: 1 }}>
