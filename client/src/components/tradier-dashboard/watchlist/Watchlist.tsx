@@ -5,11 +5,11 @@ import { formatCurrency } from '../../../utils/currency';
 import { Refresh } from '@mui/icons-material';
 
 interface WatchlistProperties {
-    symbols: Array<string>;
+    symbols: string[];
 }
 
 export default function Watchlist(props: WatchlistProperties): ReactNode {
-    const [quotes, setQuotes]: [Array<Quote>, Dispatch<SetStateAction<Array<Quote>>>] = useState<Array<Quote>>([]);
+    const [quotes, setQuotes]: [Quote[], Dispatch<SetStateAction<Quote[]>>] = useState<Quote[]>([]);
     const [error, setError]: [string | undefined, Dispatch<SetStateAction<string | undefined>>] = useState<string | undefined>(undefined);
 
     const refresh = useCallback(async (): Promise<void> => {

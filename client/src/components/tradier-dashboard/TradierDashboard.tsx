@@ -4,7 +4,7 @@ import { Box } from "@mui/material";
 import Watchlist from "./watchlist/Watchlist";
 
 export default function TradierDashboard(): ReactNode {
-    const [symbols, setSymbols]: [Array<string>, Dispatch<SetStateAction<Array<string>>>] = useState<Array<string>>((): Array<string> => {
+    const [symbols, setSymbols]: [string[], Dispatch<SetStateAction<string[]>>] = useState<string[]>((): string[] => {
         const savedQuotes: string | null = localStorage.getItem('mySavedQuotes');
         return savedQuotes ? JSON.parse(savedQuotes) : [];
     });
@@ -14,17 +14,15 @@ export default function TradierDashboard(): ReactNode {
     }, [symbols]);
 
     function addSymbol(symbolToAdd: string): void {
-        if (!symbols.some((symbol: string): boolean => {
-            return symbol === symbolToAdd;
-        })) {
+        if (!symbols.some((symbol: string): boolean => symbol === symbolToAdd)) {
             setSymbols([...symbols, symbolToAdd]);
         }
     }
 
-    function deleteSymbol(indexToDelete: number): void {
-        setSymbols((prevQuotes: Array<string>): Array<string> => {
-            return prevQuotes.filter((_: string, index: number) => index !== indexToDelete);
-        })
+    function deleteSymbol(symbolToDelete: string): void {
+        if (symbols.some((symbol: string): boolean => symbol === symbolToDelete)) {
+            setSymbols(symbols.filter((symbol: string): boolean => symbol !== symbolToDelete ));
+        }
     }
 
     return <Box sx={{ display: 'block' }}>

@@ -1,17 +1,18 @@
 import { useState, type Dispatch, type ReactNode, type SetStateAction } from 'react';
 import { Box, Card, CardContent, CardHeader, IconButton, Paper, TextField, Typography } from '@mui/material';
-import { Search, Visibility } from '@mui/icons-material';
+import { Search, Visibility, VisibilityOff } from '@mui/icons-material';
 import { quotesService, type Quote } from '../../../api/quotes-service';
 import { formatCurrency } from '../../../utils/currency';
 
 interface QuotesCardProperties {
     addSymbol: (symbol: string) => void;
-    deleteSymbol: (index: number) => void;
+    deleteSymbol: (symbol: string) => void;
 }
 
 export default function QuotesCard(props: QuotesCardProperties): ReactNode {
     const [search, setSearch]: [string, Dispatch<SetStateAction<string>>] = useState('');
     const [quote, setQuote]: [Quote | undefined, Dispatch<SetStateAction<Quote | undefined>>] = useState<Quote | undefined>(undefined);
+    const [visibilityIcon, setVisibilityIcon]: [boolean, Dispatch<SetStateAction<boolean>>] = useState(true);
     const [error, setError]: [string | undefined, Dispatch<SetStateAction<string | undefined>>] = useState<string | undefined>(undefined);
 
     function handleChange(event: React.ChangeEvent<HTMLInputElement>): void {
@@ -22,6 +23,7 @@ export default function QuotesCard(props: QuotesCardProperties): ReactNode {
         try {
             const data: Quote = await quotesService.fetchQuotes([search.replaceAll(',', '')]) as Quote;
             setQuote(data);
+            setVisibilityIcon(JSON.parse(localStorage.getItem('mySavedQuotes') || '[]').includes(data.symbol));
         } catch (e: unknown) {
             if (e instanceof Error) {
                 setError(e.message);
@@ -65,8 +67,8 @@ export default function QuotesCard(props: QuotesCardProperties): ReactNode {
                 placeholder='Enter a symbol for quote data...'
             />
         </CardContent>
-        { quote ?
-            <CardContent sx={{ pt: 0.5, pb: 0, blockSize: 288, borderBlockColor: 'inherit' }}>
+        { quote
+            ? <CardContent sx={{ pt: 0.5, pb: 0, blockSize: 288, borderBlockColor: 'inherit' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                     <Typography variant='body2' sx={{ lineHeight: '20px' }}><b>{quote.symbol}</b></Typography>
                     <Typography variant='body2' sx={{ lineHeight: '20px' }}><b>{formatCurrency(quote.last, 'USD')}</b></Typography>
@@ -114,19 +116,34 @@ export default function QuotesCard(props: QuotesCardProperties): ReactNode {
                         <Typography variant='body2' sx={{ lineHeight: '20px' }}>{quote.volume.toLocaleString('en-US')}</Typography>
                     </Box>
                     <Paper className='icon-outline' variant='outlined' sx={{ py: 0, mt: 1.5 }}>
-                        <IconButton
-                            className='watch-button'
-                            sx={{ p: 0.5 }}
-                            onClick={(): void => props.addSymbol(quote.symbol)}>
-                            <Visibility className='watch-icon' />
-                        </IconButton>
+                        { visibilityIcon
+                            ? <IconButton
+                                className='unwatch-button'
+                                sx={{ p: 0.5 }}
+                                onClick={(): void => {
+                                    props.deleteSymbol(quote.symbol);
+                                    setVisibilityIcon(!visibilityIcon);
+                                }}>
+                                <VisibilityOff className='unwatch-icon' />
+                            </IconButton>
+                            : <IconButton
+                                className='watch-button'
+                                sx={{ p: 0.5 }}
+                                onClick={(): void => {
+                                    props.addSymbol(quote.symbol);
+                                    setVisibilityIcon(!visibilityIcon);
+                                }}>
+                                <Visibility className='watch-icon' />
+                            </IconButton>
+                        }
                     </Paper>
                 </Box>
             </CardContent>
-        : error ? 
-            <Box sx={{ px: 2, py: 0 }}>
-                <Typography variant='body1' sx={{ lineHeight: '20px' }}>{error}</Typography>
-            </Box>
-        : undefined }
+            : error
+                ? <Box sx={{ px: 2, py: 0 }}>
+                    <Typography variant='body1' sx={{ lineHeight: '20px' }}>{error}</Typography>
+                </Box>
+                : undefined
+        }
     </Card>;
 }
