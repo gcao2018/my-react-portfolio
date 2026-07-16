@@ -1,39 +1,38 @@
 import { useEffect, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import QuotesCard from "./quotes-card/QuotesCard";
-import type { Quote } from "../../api/quote-service";
 import { Box } from "@mui/material";
 import Watchlist from "./watchlist/Watchlist";
 
 export default function TradierDashboard(): ReactNode {
-    const [quotes, setQuotes]: [Array<Quote>, Dispatch<SetStateAction<Array<Quote>>>] = useState<Array<Quote>>((): Array<Quote> => {
+    const [symbols, setSymbols]: [Array<string>, Dispatch<SetStateAction<Array<string>>>] = useState<Array<string>>((): Array<string> => {
         const savedQuotes: string | null = localStorage.getItem('mySavedQuotes');
         return savedQuotes ? JSON.parse(savedQuotes) : [];
     });
 
-    useEffect(() => {
-        localStorage.setItem('mySavedQuotes', JSON.stringify(quotes));
-    }, [quotes]);
+    useEffect((): void => {
+        localStorage.setItem('mySavedQuotes', JSON.stringify(symbols));
+    }, [symbols]);
 
-    function addQuote(quoteToAdd: Quote): void {
-        if (!quotes.some((quote: Quote): boolean => {
-            return quote.symbol === quoteToAdd.symbol
+    function addSymbol(symbolToAdd: string): void {
+        if (!symbols.some((symbol: string): boolean => {
+            return symbol === symbolToAdd;
         })) {
-            setQuotes([...quotes, quoteToAdd]);
+            setSymbols([...symbols, symbolToAdd]);
         }
     }
 
-    function deleteQuote(indexToDelete: number): void {
-        setQuotes((prevQuotes: Array<Quote>): Array<Quote> => {
-            return prevQuotes.filter((_: Quote, index: number) => index !== indexToDelete);
+    function deleteSymbol(indexToDelete: number): void {
+        setSymbols((prevQuotes: Array<string>): Array<string> => {
+            return prevQuotes.filter((_: string, index: number) => index !== indexToDelete);
         })
     }
 
     return <Box sx={{ display: 'block' }}>
         <Box sx={{ display: 'inline-block', verticalAlign: 'top' }}>
-            <QuotesCard addQuote={addQuote} deleteQuote={deleteQuote} />
+            <QuotesCard addSymbol={addSymbol} deleteSymbol={deleteSymbol} />
         </Box>
         <Box sx={{ display: 'inline-block', verticalAlign: 'top' }}>
-            <Watchlist quotes={quotes} />
+            <Watchlist symbols={symbols} />
         </Box>
     </Box>
 }

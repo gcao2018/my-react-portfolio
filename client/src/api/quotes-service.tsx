@@ -3,7 +3,7 @@ import apiClient from './api-client';
 interface Quotes {
     data: {
         quotes: {
-            quote: Quote;
+            quote: Quote | Array<Quote>;
         }
     }
 }
@@ -39,13 +39,14 @@ export interface Quote {
 }
 
 interface QuoteService {
-    fetchQuote: (quote: string) => Promise<Quote>;
+    fetchQuotes: (quotes: Array<string>) => Promise<Quote | Array<Quote>>;
 }
 
-export const quoteService: QuoteService = {
-    fetchQuote: async (quote: string): Promise<Quote> => {
+export const quotesService: QuoteService = {
+    fetchQuotes: async (quotes: Array<string>): Promise<Quote | Array<Quote>> => {
+        const quotesString: string = quotes.join(',');
         try {
-            const response: Quotes = await apiClient.get(`/api/quote/${quote}`);
+            const response: Quotes = await apiClient.get(`/api/quote/${quotesString}`);
             return response.data.quotes.quote;
         } catch (e: unknown) {
             if (e instanceof Error) {

@@ -1,12 +1,12 @@
 import { useState, type Dispatch, type ReactNode, type SetStateAction } from 'react';
 import { Box, Card, CardContent, CardHeader, IconButton, Paper, TextField, Typography } from '@mui/material';
 import { Search, Visibility } from '@mui/icons-material';
-import { quoteService, type Quote } from '../../../api/quote-service';
+import { quotesService, type Quote } from '../../../api/quotes-service';
 import { formatCurrency } from '../../../utils/currency';
 
 interface QuotesCardProperties {
-    addQuote: (quote: Quote) => void;
-    deleteQuote: (index: number) => void;
+    addSymbol: (symbol: string) => void;
+    deleteSymbol: (index: number) => void;
 }
 
 export default function QuotesCard(props: QuotesCardProperties): ReactNode {
@@ -20,7 +20,7 @@ export default function QuotesCard(props: QuotesCardProperties): ReactNode {
 
     async function searchQuotes(): Promise<void> {
         try {
-            const data = await quoteService.fetchQuote(search);
+            const data: Quote = await quotesService.fetchQuotes([search.replaceAll(',', '')]) as Quote;
             setQuote(data);
         } catch (e: unknown) {
             if (e instanceof Error) {
@@ -117,7 +117,7 @@ export default function QuotesCard(props: QuotesCardProperties): ReactNode {
                         <IconButton
                             className='watch-button'
                             sx={{ p: 0.5 }}
-                            onClick={(): void => props.addQuote(quote)}>
+                            onClick={(): void => props.addSymbol(quote.symbol)}>
                             <Visibility className='watch-icon' />
                         </IconButton>
                     </Paper>

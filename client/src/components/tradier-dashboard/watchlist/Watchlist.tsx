@@ -1,19 +1,52 @@
-import { Box, Card, CardContent, CardHeader, Typography } from '@mui/material';
-import type { Quote } from '../../../api/quote-service';
-import type { ReactNode } from 'react';
+import { Box, Card, CardContent, CardHeader, IconButton, Paper, Typography } from '@mui/material';
+import { quotesService, type Quote } from '../../../api/quotes-service';
+import { useCallback, useEffect, useState, type Dispatch, type ReactNode, type SetStateAction } from 'react';
 import { formatCurrency } from '../../../utils/currency';
+import { Refresh } from '@mui/icons-material';
 
 interface WatchlistProperties {
-    quotes: Array<Quote>;
+    symbols: Array<string>;
 }
 
 export default function Watchlist(props: WatchlistProperties): ReactNode {
+    const [quotes, setQuotes]: [Array<Quote>, Dispatch<SetStateAction<Array<Quote>>>] = useState<Array<Quote>>([]);
+    const [error, setError]: [string | undefined, Dispatch<SetStateAction<string | undefined>>] = useState<string | undefined>(undefined);
+
+    const refresh = useCallback(async (): Promise<void> => {
+        try {
+            const data: Quote | Quote[] = await quotesService.fetchQuotes(props.symbols);
+            if (data instanceof Array) {
+                setQuotes(data);
+            } else {
+                setQuotes([data]);
+            }
+        } catch (e: unknown) {
+            if (e instanceof Error) {
+                setError(e.message);
+            }
+        }
+    }, [props.symbols]);
+
+    useEffect((): void => {
+        const setData: () => Promise<void> = async (): Promise<void> => {
+            refresh();
+        }
+        setData();
+    }, [refresh]);
+
     return <Card className='watchlist' variant='outlined' sx={{ m: 1, width: 322 }}>
         <CardHeader
             className='header'
             title={<Typography variant='h6'>Watchlist</Typography>}
             disableTypography={true}
             sx={{ py: 1, borderBottom: 1, borderBottomColor: 'inherit' }}
+            action={
+                <Paper className='icon-outline' variant='outlined' sx={{ mt: 0.5 }}>
+                    <IconButton className='refresh-button' sx={{ p: 0.5 }} onClick={refresh}>
+                        <Refresh className='refresh-icon' />
+                    </IconButton>
+                </Paper>
+            }
         />
         <CardContent
             className='column-headers'
@@ -21,7 +54,7 @@ export default function Watchlist(props: WatchlistProperties): ReactNode {
                 py: 0,
                 blockSize: 48,
                 borderBottom: 1,
-                borderBottomColor: props.quotes.length > 0 ? 'inherit' : 'transparent'
+                borderBottomColor: quotes.length > 0 ? 'inherit' : 'transparent'
             }}>
             <Box sx={{ display: 'grid', gridTemplateColumns: '96px 96px 96px', width: '100%', py: 1.75 }}>
                 <Typography variant='body2' sx={{ textAlign: 'left', lineHeight: '20px' }}><b>Symbol</b></Typography>
@@ -29,47 +62,60 @@ export default function Watchlist(props: WatchlistProperties): ReactNode {
                 <Typography variant='body2' sx={{ textAlign: 'right', lineHeight: '20px' }}><b>Change</b></Typography>
             </Box>
         </CardContent>
-        {props.quotes.map((quote: Quote, index: number): ReactNode => {
+        {quotes.map((quote: Quote, index: number): ReactNode => {
             return <CardContent
                 key={index}
-                sx={{ py: 0, blockSize: 48, borderBottom: 1, borderBottomColor: index === props.quotes.length - 1 ? 'transparent' : 'inherit' }}>
-                <Box sx={{ display: 'grid', gridTemplateColumns: '96px 96px 96px', width: '100%' }}>
-                    <Typography
-                        variant='body2'
-                        sx={{ textAlign: 'left', py: 1.75, lineHeight: '20px' }}>
-                        <b>{quote.symbol}</b>
-                    </Typography>
-                    <Typography
-                        variant='body2'
-                        sx={{
-                            textAlign: 'left',
-                            lineHeight: '20px',
-                            py: 1.75,
-                            color: quote.change > 0 ? '#04b544' : '#ff2c2c' }}>
+                sx={{
+                    py: 0,
+                    blockSize: 48,
+                    borderBottom: 1,
+                    borderBottomColor: index === props.symbols.length - 1 ? 'transparent' : 'inherit'
+                }}>
+                { quote ? 
+                    <Box sx={{ display: 'grid', gridTemplateColumns: '96px 96px 96px', width: '100%' }}>
+                        <Typography
+                            variant='body2'
+                            sx={{ textAlign: 'left', py: 1.75, lineHeight: '20px' }}>
+                            <b>{quote.symbol}</b>
+                        </Typography>
+                        <Typography
+                            variant='body2'
+                            sx={{
+                                textAlign: 'left',
+                                lineHeight: '20px',
+                                py: 1.75,
+                                color: quote.change > 0 ? '#04b544' : '#ff2c2c'
+                            }}>
                             {formatCurrency(quote.last, 'USD')}
                         </Typography>
-                    <Box sx={{display: 'block', py: 0.5 }}>
-                        <Typography
-                            variant='body2'
-                            sx={{
-                                textAlign: 'right',
-                                lineHeight: '20px',
-                                color: quote.change > 0 ? '#04b544' : '#ff2c2c'
-                            }}>
-                            {formatCurrency(quote.change, 'USD')}
-                        </Typography>
-                        <Typography
-                            variant='body2'
-                            sx={{
-                                textAlign: 'right',
-                                lineHeight: '20px',
-                                color: quote.change > 0 ? '#04b544' : '#ff2c2c'
-                            }}>
-                            {quote.change_percentage}%
-                        </Typography>
+                        <Box sx={{display: 'block', py: 0.5 }}>
+                            <Typography
+                                variant='body2'
+                                sx={{
+                                    textAlign: 'right',
+                                    lineHeight: '20px',
+                                    color: quote.change > 0 ? '#04b544' : '#ff2c2c'
+                                }}>
+                                {formatCurrency(quote.change, 'USD')}
+                            </Typography>
+                            <Typography
+                                variant='body2'
+                                sx={{
+                                    textAlign: 'right',
+                                    lineHeight: '20px',
+                                    color: quote.change > 0 ? '#04b544' : '#ff2c2c'
+                                }}>
+                                {quote.change_percentage}%
+                            </Typography>
+                        </Box>
                     </Box>
-                </Box>
+                : undefined }
             </CardContent>
         })}
+        { error ?
+            <Box sx={{ px: 2, py: 0 }}>
+                <Typography variant='body1' sx={{ lineHeight: '20px' }}>{error}</Typography>
+            </Box>
+        : undefined }
     </Card>
 }
