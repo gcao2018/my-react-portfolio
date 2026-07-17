@@ -20,11 +20,19 @@ export default function QuotesCard(props: QuotesCardProperties): ReactNode {
         setSearch(event.target.value);
     }
 
+    function isSaved(quote: Quote): boolean {
+        return JSON.parse(localStorage.getItem('mySavedQuotes') || '[]').includes(quote.symbol);
+    }
+
+    function toggleVisibilityIcon(): void {
+        setVisibilityIcon((prevVisibilityIcon: boolean): boolean => !prevVisibilityIcon);
+    }
+
     async function searchQuotes(): Promise<void> {
         try {
             const data: Quote = await props.quotesService.fetchQuotes([search.replaceAll(',', '')]) as Quote;
             setQuote(data);
-            setVisibilityIcon(JSON.parse(localStorage.getItem('mySavedQuotes') || '[]').includes(data.symbol));
+            setVisibilityIcon(isSaved(data));
         } catch (e: unknown) {
             if (e instanceof Error) {
                 setError(e.message);
@@ -123,7 +131,7 @@ export default function QuotesCard(props: QuotesCardProperties): ReactNode {
                                 sx={{ p: 0.5 }}
                                 onClick={(): void => {
                                     props.deleteSymbol(quote.symbol);
-                                    setVisibilityIcon(!visibilityIcon);
+                                    toggleVisibilityIcon();
                                 }}>
                                 <VisibilityOff className='unwatch-icon' />
                             </IconButton>
@@ -132,7 +140,7 @@ export default function QuotesCard(props: QuotesCardProperties): ReactNode {
                                 sx={{ p: 0.5 }}
                                 onClick={(): void => {
                                     props.addSymbol(quote.symbol);
-                                    setVisibilityIcon(!visibilityIcon);
+                                    toggleVisibilityIcon();
                                 }}>
                                 <Visibility className='watch-icon' />
                             </IconButton>
