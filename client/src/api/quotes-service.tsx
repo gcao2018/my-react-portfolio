@@ -38,11 +38,11 @@ export interface Quote {
     root_symbols: string;
 }
 
-interface QuoteService {
+export interface QuotesService {
     fetchQuotes: (quotes: string[]) => Promise<Quote | Quote[]>;
 }
 
-export const quotesService: QuoteService = {
+export const quotesService: QuotesService = {
     fetchQuotes: async (quotes: string[]): Promise<Quote | Quote[]> => {
         const quotesString: string = quotes.join(',');
         try {

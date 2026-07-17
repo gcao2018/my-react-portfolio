@@ -1,12 +1,13 @@
 import { useState, type Dispatch, type ReactNode, type SetStateAction } from 'react';
 import { Box, Card, CardContent, CardHeader, IconButton, Paper, TextField, Typography } from '@mui/material';
 import { Search, Visibility, VisibilityOff } from '@mui/icons-material';
-import { quotesService, type Quote } from '../../../api/quotes-service';
+import { type Quote, type QuotesService } from '../../../api/quotes-service';
 import { formatCurrency } from '../../../utils/currency';
 
 interface QuotesCardProperties {
     addSymbol: (symbol: string) => void;
     deleteSymbol: (symbol: string) => void;
+    quotesService: QuotesService;
 }
 
 export default function QuotesCard(props: QuotesCardProperties): ReactNode {
@@ -21,7 +22,7 @@ export default function QuotesCard(props: QuotesCardProperties): ReactNode {
 
     async function searchQuotes(): Promise<void> {
         try {
-            const data: Quote = await quotesService.fetchQuotes([search.replaceAll(',', '')]) as Quote;
+            const data: Quote = await props.quotesService.fetchQuotes([search.replaceAll(',', '')]) as Quote;
             setQuote(data);
             setVisibilityIcon(JSON.parse(localStorage.getItem('mySavedQuotes') || '[]').includes(data.symbol));
         } catch (e: unknown) {

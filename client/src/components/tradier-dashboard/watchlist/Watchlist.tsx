@@ -1,11 +1,12 @@
 import { Box, Card, CardContent, CardHeader, IconButton, Paper, Typography } from '@mui/material';
-import { quotesService, type Quote } from '../../../api/quotes-service';
+import { type Quote, type QuotesService } from '../../../api/quotes-service';
 import { useCallback, useEffect, useState, type Dispatch, type ReactNode, type SetStateAction } from 'react';
 import { formatCurrency } from '../../../utils/currency';
 import { Refresh } from '@mui/icons-material';
 
 interface WatchlistProperties {
     symbols: string[];
+    quotesService: QuotesService;
 }
 
 export default function Watchlist(props: WatchlistProperties): ReactNode {
@@ -14,18 +15,20 @@ export default function Watchlist(props: WatchlistProperties): ReactNode {
 
     const refresh = useCallback(async (): Promise<void> => {
         try {
-            const data: Quote | Quote[] = await quotesService.fetchQuotes(props.symbols);
-            if (data instanceof Array) {
-                setQuotes(data);
-            } else {
-                setQuotes([data]);
+            if (props.symbols.length > 0) {
+                const data: Quote | Quote[] = await props.quotesService.fetchQuotes(props.symbols);
+                if (data instanceof Array) {
+                    setQuotes(data);
+                } else {
+                    setQuotes([data]);
+                }
             }
         } catch (e: unknown) {
             if (e instanceof Error) {
                 setError(e.message);
             }
         }
-    }, [props.symbols]);
+    }, [props.quotesService, props.symbols]);
 
     useEffect((): void => {
         const setData: () => Promise<void> = async (): Promise<void> => {
