@@ -34,7 +34,7 @@ app.get('/', (req: Request, res: Response): void => {
   res.json('Hello from TypeScript and Express!');
 });
 
-app.post('/api/login', async (req: Request, res: Response): Promise<void> => {
+app.post('/api/auth/login', async (req: Request, res: Response): Promise<void> => {
   const { username, password }: LoginCredentials = req.body;
   const user: User | undefined = users.find((user: User): boolean => username === user.username);
   if (!user) {
@@ -76,8 +76,8 @@ function authenticateToken(req: Request, res: Response, next: NextFunction): voi
   }
 };
 
-app.post('/api/protected', authenticateToken, async (req: Request, res: Response): Promise<void> => {
-  res.json('Order placed!');
+app.post('/api/auth/verify', authenticateToken, async (req: Request, res: Response): Promise<void> => {
+  res.status(200).json('Token authenticated');
 });
 
 app.get('/api/quote/:symbol', async (req: Request, res: Response): Promise<void> => {

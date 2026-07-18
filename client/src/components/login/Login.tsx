@@ -1,15 +1,19 @@
 import { Box, Button, Card, CardContent, CardHeader, FormGroup, TextField, Typography } from '@mui/material';
-import { useState, type Dispatch, type ReactNode, type SetStateAction } from 'react';
-import type { SigninService } from '../../api/signin-service';
+import { useContext, useState, type Dispatch, type ReactNode, type SetStateAction } from 'react';
+import type { AuthService } from '../../api/auth-service';
+import { useNavigate, type NavigateFunction } from 'react-router';
+import { AuthContext, type AuthContextType } from '../auth/AuthContext';
 
 interface LoginProperties {
-    signinService: SigninService
+    authService: AuthService
 }
 
 export default function Login(props: LoginProperties): ReactNode {
     const [username, setUsername]: [string, Dispatch<SetStateAction<string>>] = useState<string>('');
     const [password, setPassword]: [string, Dispatch<SetStateAction<string>>] = useState<string>('');
     const [error, setError]: [string | undefined, Dispatch<SetStateAction<string | undefined>>] = useState<string | undefined>(undefined);
+    const context: AuthContextType | null = useContext(AuthContext);
+    const navigate: NavigateFunction = useNavigate();
     
     function handleUsernameChange(event: React.ChangeEvent<HTMLInputElement>): void {
         setUsername(event.target.value);
@@ -21,8 +25,10 @@ export default function Login(props: LoginProperties): ReactNode {
 
     async function login(username: string, password: string): Promise<void> {
         try {
-            const token: string = await props.signinService.login(username, password);
+            const token: string = await props.authService.login(username, password);
             localStorage.setItem('token', token);
+            await context?.validateToken();
+            navigate('/dashboard');
         } catch (e: unknown) {
             if (e instanceof Error) {
                 setError(e.message);
@@ -76,7 +82,7 @@ export default function Login(props: LoginProperties): ReactNode {
             </FormGroup>
         </CardContent>
         { error ?
-            <Box sx={{ px: 2, py: 0 }}>
+            <Box sx={{ px: 2, pb: 1 }}>
                 <Typography variant='body1' sx={{ lineHeight: '20px' }}>{error}</Typography>
             </Box>
         : undefined }

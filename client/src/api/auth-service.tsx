@@ -7,15 +7,16 @@ interface Jwt {
     }
 }
 
-export interface SigninService {
+export interface AuthService {
     login: (username: string, password: string) => Promise<string>;
+    validate: () => Promise<boolean>;
     register: (username: string, password: string, email?: string) => void;
 }
 
-export const signinService: SigninService = {
+export const authService: AuthService = {
     login: async function (username: string, password: string): Promise<string> {
         try {
-            const response: Jwt = await apiClient.post('/api/login', { username: username, password: password });
+            const response: Jwt = await apiClient.post('/api/auth/login', { username: username, password: password });
             return response.data.token;
         } catch (e: unknown) {
             if (e instanceof Error) {
@@ -23,6 +24,15 @@ export const signinService: SigninService = {
             } else {
                 throw new Error('An unexpected error occurred', { cause: e });
             }
+        }
+    },
+
+    validate: async function (): Promise<boolean> {
+        try {
+            const response = await apiClient.post('api/auth/verify');
+            return response.status === 200;
+        } catch {
+            return false;
         }
     },
 

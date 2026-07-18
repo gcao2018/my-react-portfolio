@@ -149,7 +149,7 @@ export default function QuotesCard(props: QuotesCardProperties): ReactNode {
                 </Box>
             </CardContent>
             : error
-                ? <Box sx={{ px: 2, py: 0 }}>
+                ? <Box sx={{ px: 2, pb: 1 }}>
                     <Typography variant='body1' sx={{ lineHeight: '20px' }}>{error}</Typography>
                 </Box>
                 : undefined

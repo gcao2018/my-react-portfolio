@@ -13,7 +13,7 @@ export default function Watchlist(props: WatchlistProperties): ReactNode {
     const [quotes, setQuotes]: [Quote[], Dispatch<SetStateAction<Quote[]>>] = useState<Quote[]>([]);
     const [error, setError]: [string | undefined, Dispatch<SetStateAction<string | undefined>>] = useState<string | undefined>(undefined);
 
-    const refresh = useCallback(async (): Promise<void> => {
+    const refresh: () => Promise<void> = useCallback(async (): Promise<void> => {
         try {
             if (props.symbols.length > 0) {
                 const data: Quote | Quote[] = await props.quotesService.fetchQuotes(props.symbols);
@@ -116,7 +116,7 @@ export default function Watchlist(props: WatchlistProperties): ReactNode {
             </CardContent>
         })}
         { error ?
-            <Box sx={{ px: 2, py: 0 }}>
+            <Box sx={{ px: 2, pb: 1 }}>
                 <Typography variant='body1' sx={{ lineHeight: '20px' }}>{error}</Typography>
             </Box>
         : undefined }
