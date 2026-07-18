@@ -9,7 +9,8 @@ export default function Navbar(): ReactNode {
         <Toolbar variant='dense' disableGutters>
             <Button color='inherit' onClick={(): void => { navigate('/'); }}>Home</Button>
             <Button color='inherit' onClick={(): void => { navigate('/resume'); }}>Resume</Button>
-            <Button color='inherit' onClick={(): void => { navigate('/tradier-dashboard')}}>Login With Tradier</Button>
+            <Button color='inherit' onClick={(): void => { navigate('/dashboard')}}>Dashboard</Button>
+            <Button color='inherit' onClick={(): void => { navigate('/login')}}>Login</Button>
         </Toolbar>
     </AppBar>;
 };

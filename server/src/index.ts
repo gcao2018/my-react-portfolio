@@ -34,7 +34,7 @@ app.get('/', (req: Request, res: Response): void => {
   res.json('Hello from TypeScript and Express!');
 });
 
-app.post('/login', async (req: Request, res: Response): Promise<void> => {
+app.post('/api/login', async (req: Request, res: Response): Promise<void> => {
   const { username, password }: LoginCredentials = req.body;
   const user: User | undefined = users.find((user: User): boolean => username === user.username);
   if (!user) {

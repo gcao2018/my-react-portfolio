@@ -4,7 +4,7 @@ import { Box } from "@mui/material";
 import Watchlist from "./watchlist/Watchlist";
 import { quotesService } from "../../api/quotes-service";
 
-export default function TradierDashboard(): ReactNode {
+export default function Dashboard(): ReactNode {
     const [symbols, setSymbols]: [string[], Dispatch<SetStateAction<string[]>>] = useState<string[]>((): string[] => {
         const savedQuotes: string | null = localStorage.getItem('mySavedQuotes');
         return savedQuotes ? JSON.parse(savedQuotes) : [];
