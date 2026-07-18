@@ -10,7 +10,7 @@ interface Jwt {
 export interface AuthService {
     login: (username: string, password: string) => Promise<string>;
     validate: () => Promise<boolean>;
-    register: (username: string, password: string, email?: string) => void;
+    register: (username: string, password: string) => void;
 }
 
 export const authService: AuthService = {
@@ -36,9 +36,8 @@ export const authService: AuthService = {
         }
     },
 
-    register: function (username: string, password: string, email?: string): void {
+    register: function (username: string, password: string): void {
         console.log('username: ', username);
         console.log('password: ', password);
-        console.log('email: ', email);
     }
 }

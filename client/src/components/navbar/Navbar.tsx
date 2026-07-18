@@ -1,16 +1,28 @@
 import { AppBar, Button, Toolbar } from '@mui/material';
-import type { ReactNode } from 'react';
-import { useNavigate } from 'react-router';
+import { useContext, useEffect, type ReactNode } from 'react';
+import { useNavigate, type NavigateFunction } from 'react-router';
+import { AuthContext, type AuthContextType } from '../auth/AuthContext';
 
 export default function Navbar(): ReactNode {
-    const navigate = useNavigate();
+    const context: AuthContextType | null = useContext(AuthContext);
+    const navigate: NavigateFunction = useNavigate();
+
+    useEffect(() => {
+        context?.validateToken();
+    }, [context]);
 
     return <AppBar position='static'>
         <Toolbar variant='dense' disableGutters>
             <Button color='inherit' onClick={(): void => { navigate('/'); }}>Home</Button>
             <Button color='inherit' onClick={(): void => { navigate('/resume'); }}>Resume</Button>
-            <Button color='inherit' onClick={(): void => { navigate('/dashboard')}}>Dashboard</Button>
-            <Button color='inherit' onClick={(): void => { navigate('/login')}}>Login</Button>
+            <Button color='inherit' onClick={(): void => { navigate('/dashboard'); }}>Dashboard</Button>
+            { context?.tokenValidated
+                ? <Button color='inherit' onClick={async (): Promise<void> => { 
+                    localStorage.removeItem('token');
+                    await context?.validateToken();
+                }}>Logout</Button>
+                : <Button color='inherit' onClick={(): void => { navigate('/login'); }}>Login</Button>
+            }
         </Toolbar>
     </AppBar>;
 };
