@@ -1,5 +1,5 @@
-import { CreateTableCommand, DynamoDBClient, ListTablesCommand } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
+import { CreateTableCommand, DynamoDBClient, ListTablesCommand, QueryCommand, ScanCommand, type CreateTableCommandOutput } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, PutCommand, type ScanCommandOutput } from '@aws-sdk/lib-dynamodb';
 
 const client: DynamoDBClient = new DynamoDBClient({
     endpoint: process.env.DYNAMODB_ENDPOINT || '',
@@ -27,24 +27,73 @@ export async function testConnection(): Promise<boolean> {
 }
 
 export async function createUsersTable(): Promise<void> {
-    const command = new CreateTableCommand({
-        TableName: 'Users',
-        AttributeDefinitions: [
-            { AttributeName: 'UserId', AttributeType: 'S' },
-            { AttributeName: 'Email', AttributeType: 'S' },
-            { AttributeName: 'Username', AttributeType: 'S' },
-            { AttributeName: 'PasswordHash', AttributeType: 'S' }
-        ],
-        KeySchema: [
-            { AttributeName: 'UserId', KeyType: 'HASH' },
-            { AttributeName: 'Email', KeyType: 'RANGE' },
-            { AttributeName: 'Username', KeyType: 'RANGE' },
-            { AttributeName: 'PasswordHash', KeyType: 'RANGE' }
-        ],
-        BillingMode: 'PAY_PER_REQUEST'
-    });
+    try {
+        const command = new CreateTableCommand({
+            TableName: 'Users',
+            AttributeDefinitions: [
+                { AttributeName: 'UserId', AttributeType: 'N' }
+            ],
+            KeySchema: [
+                { AttributeName: 'UserId', KeyType: 'HASH' }
+            ],
+            BillingMode: 'PAY_PER_REQUEST'
+        });
+        const response: CreateTableCommandOutput = await client.send(command);
+        console.log('Table status:', response?.TableDescription?.TableStatus);
+    } catch (error) {
+        console.error('Error creating table:', error);
+    }
 }
 
-testConnection();
+export async function insertItem(): Promise<void> {
+    const command = new PutCommand({
+        TableName: 'Users',
+        Item: {
+            UserId: 1,
+            Username: 'gcao',
+            Email: 'gcc2018@gmail.com'
+        }
+    });
+
+    try {
+        await db.send(command);
+        console.log('Item inserted successfully!');
+    } catch (error) {
+        console.error('Error inserting item:', error);
+    }
+}
+
+export async function viewAllItemsScan(): Promise<void> {
+    const command: ScanCommand = new ScanCommand({ TableName: 'Users' });
+    try {
+        const response: ScanCommandOutput = await db.send(command);
+        console.log('Query Results:', response.Items);
+    } catch (error) {
+        console.error('Error querying table:', error);
+    }
+}
+
+export async function viewItemsByQuery(): Promise<void> {
+    const command = new QueryCommand({
+        TableName: 'Users',
+        KeyConditionExpression: 'UserId = :id',
+        ExpressionAttributeValues: {
+            ':id': { N: '1' }
+        }
+    });
+
+    try {
+        const response = await db.send(command);
+        console.log('Query Results:', response.Items);
+    } catch (error) {
+        console.error('Error querying table:', error);
+    }
+}
+
+// createUsersTable();
+// insertItem();
+// viewAllItemsScan();
+viewItemsByQuery();
+// testConnection();
 
 export default db;

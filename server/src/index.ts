@@ -23,7 +23,7 @@ app.use(cors());
 // mock users database
 const users: User[] = [
   {
-    id: 1, 
+    id: 1,
     email: process.env.MOCK_EMAIL as string,
     username: process.env.MOCK_USERNAME as string,
     passwordHash: process.env.MOCK_PASSWORD_HASH as string
