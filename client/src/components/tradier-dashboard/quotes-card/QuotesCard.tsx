@@ -73,8 +73,7 @@ export default function QuotesCard(props: QuotesCardProperties): ReactNode {
                         sx: { pl: 0, pr: 0.5, width: 288 }
                     }
                 }}
-                placeholder='Enter a symbol for quote data...'
-            />
+                placeholder='Enter a symbol for quote data...' />
         </CardContent>
         { quote
             ? <CardContent sx={{ pt: 0.5, pb: 0, blockSize: 288, borderBlockColor: 'inherit' }}>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, type ReactNode, type Dispatch, type SetStateAction } from 'react';
-import { authService } from '../../api/auth-service';
+import { authService, type User } from '../../api/auth-service';
 import { AuthContext } from './AuthContext';
 
 interface AuthProviderProperties {
@@ -7,14 +7,16 @@ interface AuthProviderProperties {
 }
 
 export default function AuthProvider(props: AuthProviderProperties): ReactNode {
-  const [tokenValidated, setTokenValidated]: [boolean, Dispatch<SetStateAction<boolean>>] = useState<boolean>(false);
+  const [user, setUser]: [User | undefined, Dispatch<SetStateAction<User | undefined>>] = useState<User | undefined>(undefined);
+  const [error, setError]: [string | undefined, Dispatch<SetStateAction<string | undefined>>] = useState<string | undefined>(undefined);
 
   const validateToken: () => Promise<void> = useCallback(async (): Promise<void> => {
     try {
-      const validated: boolean = await authService.validate();
-      setTokenValidated(validated);
-    } catch {
-      setTokenValidated(false);
+      const user: User = await authService.validate();
+      setUser(user);
+    } catch (e: unknown) {
+      setError((e as Error).message);
+      setUser(undefined);
     }
   }, []);
 
@@ -25,7 +27,7 @@ export default function AuthProvider(props: AuthProviderProperties): ReactNode {
     setData();
   }, [validateToken]);
 
-  return <AuthContext.Provider value={{tokenValidated, validateToken}}>
+  return <AuthContext.Provider value={{user, error, validateToken}}>
     {props.children}
   </AuthContext.Provider>
 };

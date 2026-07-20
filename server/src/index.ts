@@ -1,19 +1,24 @@
 import express, { type Application, type NextFunction, type Request, type Response } from 'express';
 import cors from 'cors';
 import bcrypt from 'bcrypt';
-import jwt, { type VerifyErrors } from 'jsonwebtoken';
+import jwt, { type JwtPayload, type VerifyErrors } from 'jsonwebtoken';
 
 interface LoginCredentials {
   username: string;
   password: string;
-  email?: string;
+  email: string;
 }
 
-interface User {
+interface UserPayload extends JwtPayload {
   id: number;
-  email?: string;
+  email: string;
   username: string;
   passwordHash: string;
+  watchlist?: string[];
+}
+
+interface VerifyRequest extends Request {
+  userData: UserPayload;
 }
 
 const app: Application = express();
@@ -21,22 +26,26 @@ app.use(express.json());
 app.use(cors());
 
 // mock users database
-const users: User[] = [
+const users: UserPayload[] = [
   {
     id: 1,
     email: process.env.MOCK_EMAIL as string,
     username: process.env.MOCK_USERNAME as string,
     passwordHash: process.env.MOCK_PASSWORD_HASH as string
+  },
+  {
+    id: 2,
+    email: process.env.MOCK_EMAIL_2 as string,
+    username: process.env.MOCK_USERNAME_2 as string,
+    passwordHash: process.env.MOCK_PASSWORD_HASH_2 as string
   }
 ];
 
-app.get('/', (req: Request, res: Response): void => {
-  res.json('Hello from TypeScript and Express!');
-});
-
 app.post('/api/auth/login', async (req: Request, res: Response): Promise<void> => {
-  const { username, password }: LoginCredentials = req.body;
-  const user: User | undefined = users.find((user: User): boolean => username === user.username);
+  const { username, email, password }: LoginCredentials = req.body;
+  const user: UserPayload | undefined = users.find(
+    (user: UserPayload): boolean => username === user.username && email === user.email
+  );
   if (!user) {
     res.status(404).json({ error: 'User not found' });
     return;
@@ -51,7 +60,7 @@ app.post('/api/auth/login', async (req: Request, res: Response): Promise<void> =
     return;
   }
   const token: string = jwt.sign(
-    { userId: user.id, email: user.email },
+    { id: user.id, username: user.username, email: user.email },
     process.env.JWT_SECRET,
     { expiresIn: '1h' }
   );
@@ -66,18 +75,23 @@ function authenticateToken(req: Request, res: Response, next: NextFunction): voi
   } else if (!process.env.JWT_SECRET) {
     res.status(500).json({ error: 'Authentication key is missing on the server' });
   } else {
-    jwt.verify(token, process.env.JWT_SECRET, (error: VerifyErrors | null): void => {
-      if (error) {
-        res.status(403).json({ error: 'Invalid token' });
-      } else {
-        next();
-      }
-    });
+    try {
+      const decoded: UserPayload = jwt.verify(token, process.env.JWT_SECRET) as UserPayload;
+      (req as VerifyRequest).userData = decoded;
+      next();
+    } catch {
+      res.status(403).json({ error: 'Invalid token' });
+    }
   }
 };
 
 app.post('/api/auth/verify', authenticateToken, async (req: Request, res: Response): Promise<void> => {
-  res.status(200).json('Token authenticated');
+  const userData: UserPayload = (req as VerifyRequest).userData;
+  res.status(200).json({
+    id: userData.id,
+    username: userData.username,
+    email: userData.email
+  });
 });
 
 app.get('/api/quote/:symbol', async (req: Request, res: Response): Promise<void> => {

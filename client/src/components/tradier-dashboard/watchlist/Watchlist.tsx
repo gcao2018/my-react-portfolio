@@ -49,8 +49,7 @@ export default function Watchlist(props: WatchlistProperties): ReactNode {
                         <Refresh className='refresh-icon' />
                     </IconButton>
                 </Paper>
-            }
-        />
+            } />
         <CardContent
             className='column-headers'
             sx={{
@@ -115,10 +114,11 @@ export default function Watchlist(props: WatchlistProperties): ReactNode {
                 : undefined }
             </CardContent>
         })}
-        { error ?
-            <Box sx={{ px: 2, pb: 1 }}>
+        { error
+            ? <Box sx={{ px: 2, pb: 1 }}>
                 <Typography variant='body1' sx={{ lineHeight: '20px' }}>{error}</Typography>
             </Box>
-        : undefined }
+            : undefined
+        }
     </Card>
 }

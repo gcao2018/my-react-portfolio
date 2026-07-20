@@ -6,6 +6,7 @@ import Dashboard from './components/tradier-dashboard/Dashboard';
 import Login from './components/login/Login';
 import { authService } from './api/auth-service';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import Profile from './components/profile/Profile';
 
 export default function App() {
   return <div className='my-app'>
@@ -17,6 +18,7 @@ export default function App() {
         <Route path='/login' element={<Login authService={authService} />} />
         <Route element={<ProtectedRoute />}>
           <Route path='/dashboard' element={<Dashboard />} />
+          <Route path='/profile' element={<Profile />} />
         </Route>
       </Routes>
     </BrowserRouter>

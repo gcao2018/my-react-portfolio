@@ -10,6 +10,7 @@ interface LoginProperties {
 
 export default function Login(props: LoginProperties): ReactNode {
     const [username, setUsername]: [string, Dispatch<SetStateAction<string>>] = useState<string>('');
+    const [email, setEmail]: [string, Dispatch<SetStateAction<string>>] = useState<string>('');
     const [password, setPassword]: [string, Dispatch<SetStateAction<string>>] = useState<string>('');
     const [error, setError]: [string | undefined, Dispatch<SetStateAction<string | undefined>>] = useState<string | undefined>(undefined);
     const context: AuthContextType | null = useContext(AuthContext);
@@ -19,20 +20,22 @@ export default function Login(props: LoginProperties): ReactNode {
         setUsername(event.target.value);
     }
 
+    function handleEmailChange(event: React.ChangeEvent<HTMLInputElement>): void {
+        setEmail(event.target.value);
+    }
+
     function handlePasswordChange(event: React.ChangeEvent<HTMLInputElement>): void {
         setPassword(event.target.value);
     }
 
-    async function login(username: string, password: string): Promise<void> {
+    async function login(username: string, email: string, password: string): Promise<void> {
         try {
-            const token: string = await props.authService.login(username, password);
+            const token: string = await props.authService.login(username, email, password);
             localStorage.setItem('token', token);
             await context?.validateToken();
             navigate('/dashboard');
         } catch (e: unknown) {
-            if (e instanceof Error) {
-                setError(e.message);
-            }
+            setError((e as Error).message);
         }
     }
 
@@ -47,7 +50,7 @@ export default function Login(props: LoginProperties): ReactNode {
             className='signin-content'
             sx={{
                 py: 0,
-                blockSize: 148.5,
+                blockSize: 196.5,
                 borderBottom: 0,
                 borderBottomColor: 'inherit'
             }}>
@@ -65,6 +68,15 @@ export default function Login(props: LoginProperties): ReactNode {
                     variant='outlined'
                     size='small'
                     type='text'
+                    value={email}
+                    label='Email'
+                    className='email-input'
+                    onChange={handleEmailChange}
+                    sx={{ mt: 1 }} />
+                <TextField
+                    variant='outlined'
+                    size='small'
+                    type='text'
                     value={password}
                     label='Password'
                     className='password-input'
@@ -74,17 +86,18 @@ export default function Login(props: LoginProperties): ReactNode {
                     <Button
                         variant='outlined'
                         className='signin-button'
-                        onClick={async () => await login(username, password)}>
+                        onClick={async () => await login(username, email, password)}>
                         Signin
                     </Button>
                     <Button variant='outlined' className='register-button'>Register</Button>
                 </Box>
             </FormGroup>
         </CardContent>
-        { error ?
-            <Box sx={{ px: 2, pb: 1 }}>
+        { error
+            ? <Box sx={{ px: 2, pb: 1 }}>
                 <Typography variant='body1' sx={{ lineHeight: '20px' }}>{error}</Typography>
             </Box>
-        : undefined }
+            : undefined
+        }
     </Card>;
 };

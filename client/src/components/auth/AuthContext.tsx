@@ -1,7 +1,9 @@
 import { createContext, type Context } from "react";
+import type { User } from "../../api/auth-service";
 
 export interface AuthContextType {
-    tokenValidated: boolean;
+    user: User | undefined;
+    error: string | undefined;
     validateToken: () => Promise<void>;
 }
 

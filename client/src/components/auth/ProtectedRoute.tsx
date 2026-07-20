@@ -5,7 +5,7 @@ import { AuthContext, type AuthContextType } from './AuthContext';
 export function ProtectedRoute(): ReactNode {
     const context: AuthContextType | null = useContext(AuthContext);
 
-    if (context?.tokenValidated) {
+    if (context?.user) {
         return <Outlet />;
     } else {
         return <Navigate to="/login" replace={true} />;
